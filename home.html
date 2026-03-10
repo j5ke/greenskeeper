@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Greenskeeper</title>
+    <meta
+      name="description"
+      content="Greenskeeper is your golf course memory book. Track every course, collect badges, and share your journey."
+    />
+    <style>
+      @font-face {
+        font-family: 'FamiliarPro';
+        src: url('./fonts/FamiliarPro-Regular.woff2') format('woff2'),
+             url('./fonts/FamiliarPro-Regular.woff') format('woff');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: 'FamiliarPro';
+        src: url('./fonts/FamiliarPro-Medium.woff2') format('woff2'),
+             url('./fonts/FamiliarPro-Medium.woff') format('woff');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: 'FamiliarPro';
+        src: url('./fonts/FamiliarPro-Semibold.woff2') format('woff2'),
+             url('./fonts/FamiliarPro-Semibold.woff') format('woff');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      :root {
+        --green: #15c352;
+        --green-soft: rgba(21, 195, 82, 0.1);
+        --green-softer: rgba(21, 195, 82, 0.16);
+        --text: #18181b;
+        --muted: #71717a;
+        --line: #e4e4e7;
+        --card: rgba(255, 255, 255, 0.9);
+        --bg: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'FamiliarPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top, rgba(21, 195, 82, 0.16), transparent 35%),
+          radial-gradient(circle at 85% 20%, rgba(21, 195, 82, 0.1), transparent 28%),
+          #fff;
+      }
+
+      .page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(21, 195, 82, 0.2), transparent);
+      }
+
+      .orb {
+        position: absolute;
+        border: 1px solid rgba(21, 195, 82, 0.12);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 20px 40px rgba(21, 195, 82, 0.08);
+      }
+
+      .orb-1 {
+        top: 7rem;
+        left: 8%;
+        width: 6rem;
+        height: 6rem;
+        border-radius: 2rem;
+        animation: floatOne 7s ease-in-out infinite;
+      }
+
+      .orb-2 {
+        top: 11rem;
+        right: 12%;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 1.5rem;
+        background: rgba(21, 195, 82, 0.08);
+        animation: floatTwo 8s ease-in-out infinite 0.4s;
+      }
+
+      .orb-3 {
+        bottom: 6rem;
+        left: 18%;
+        width: 5rem;
+        height: 5rem;
+        border-radius: 999px;
+        animation: floatThree 9s ease-in-out infinite 0.7s;
+      }
+
+      .container {
+        position: relative;
+        width: min(1280px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 5rem;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .brand-mark {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(21, 195, 82, 0.2);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(21, 195, 82, 0.1);
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .brand-mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .brand-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .nav-button {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 0.8rem 1.2rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-shadow: 0 8px 24px rgba(24, 24, 27, 0.04);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .nav-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px rgba(24, 24, 27, 0.08);
+      }
+
+      .hero {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(21, 195, 82, 0.2);
+        background: rgba(21, 195, 82, 0.08);
+        color: var(--green);
+        border-radius: 999px;
+        padding: 0.5rem 1rem;
+        font-size: 0.68rem;
+        font-weight: 500;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        margin-bottom: 1.75rem;
+      }
+
+      .hero-copy {
+        max-width: 1100px;
+        text-align: center;
+      }
+
+      .hero-title {
+        margin: 0;
+        font-size: clamp(3.7rem, 9vw, 7rem);
+        line-height: 0.94;
+        letter-spacing: -0.055em;
+        font-weight: 600;
+      }
+
+      .hero-subtitle {
+        max-width: 760px;
+        margin: 2rem auto 0;
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        line-height: 1.8;
+        color: var(--muted);
+      }
+
+      .download-wrap {
+        margin-top: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.85rem;
+      }
+
+      .app-store-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-radius: 1.35rem;
+        border: 1px solid #27272a;
+        background: #000;
+        color: #fff;
+        padding: 0.9rem 1.2rem;
+        box-shadow: 0 16px 40px rgba(24, 24, 27, 0.12);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .app-store-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 24px 48px rgba(24, 24, 27, 0.16);
+      }
+
+      .app-store-icon {
+        width: 1.7rem;
+        height: 1.7rem;
+        fill: currentColor;
+        flex-shrink: 0;
+      }
+
+      .app-store-top {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.72);
+        margin-bottom: 0.25rem;
+      }
+
+      .app-store-bottom {
+        font-size: 1.1rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+      }
+
+      .coming-soon {
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      .device-section {
+        position: relative;
+        width: 100%;
+        margin-top: 5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .device-glow {
+        position: absolute;
+        width: min(28rem, 72vw);
+        aspect-ratio: 1;
+        border-radius: 999px;
+        background: rgba(21, 195, 82, 0.15);
+        filter: blur(56px);
+      }
+
+      .device-float {
+        position: relative;
+        animation: deviceFloat 6s ease-in-out infinite;
+      }
+
+      .phone-shell {
+        position: relative;
+        border-radius: 3.3rem;
+        border: 1px solid rgba(21, 195, 82, 0.18);
+        background: #fff;
+        padding: 0.75rem;
+        box-shadow: 0 50px 120px rgba(16, 24, 40, 0.14);
+      }
+
+      .phone-frame {
+        width: min(372px, 74vw);
+        height: min(760px, 150vw);
+        border-radius: 2.7rem;
+        border: 1px solid #e4e4e7;
+        background: linear-gradient(to bottom, #fff, #fff, rgba(21, 195, 82, 0.1));
+        padding: 0.75rem;
+        box-shadow: inset 0 1px 3px rgba(24, 24, 27, 0.05);
+      }
+
+      .phone-screen {
+        position: relative;
+        height: 100%;
+        border-radius: 2.2rem;
+        border: 1px solid #f4f4f5;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .dynamic-island {
+        width: 5rem;
+        height: 0.38rem;
+        border-radius: 999px;
+        background: #d4d4d8;
+        margin: 0.8rem auto 0;
+      }
+
+      .phone-image-wrap {
+        position: absolute;
+        inset: -0.1rem 0 0;
+        overflow: hidden;
+      }
+
+      .phone-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      .placeholder-ui {
+        position: absolute;
+        inset: 0;
+        padding: 1.25rem 1.25rem 1.5rem;
+      }
+
+      .placeholder-bar {
+        height: 3rem;
+        border-radius: 1rem;
+        background: rgba(21, 195, 82, 0.1);
+        margin-top: 0.85rem;
+      }
+
+      .placeholder-grid {
+        margin-top: 1.25rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(21, 195, 82, 0.2);
+        padding: 1rem;
+        background: radial-gradient(circle at 30% 20%, rgba(21, 195, 82, 0.22), rgba(255, 255, 255, 1) 55%);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+      }
+
+      .placeholder-cell {
+        aspect-ratio: 1;
+        border-radius: 1rem;
+        border: 1px solid rgba(21, 195, 82, 0.2);
+        background: rgba(21, 195, 82, 0.1);
+        box-shadow: 0 6px 18px rgba(24, 24, 27, 0.05);
+        animation: tileFloat 4.8s ease-in-out infinite;
+      }
+
+      .placeholder-cell:nth-child(2n) {
+        background: #fff;
+        border-color: #e4e4e7;
+        animation-duration: 4.1s;
+      }
+
+      .placeholder-cell:nth-child(3n) {
+        background: rgba(21, 195, 82, 0.2);
+      }
+
+      .placeholder-stack {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .placeholder-row {
+        height: 5rem;
+        border-radius: 1.5rem;
+        background: #fafafa;
+      }
+
+      .floating-card {
+        position: absolute;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        border-radius: 1.75rem;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 22px 48px rgba(21, 195, 82, 0.1);
+      }
+
+      .floating-card.left {
+        top: 6rem;
+        left: -2.5rem;
+        animation: cardFloatLeft 5.5s ease-in-out infinite;
+      }
+
+      .floating-card.right {
+        right: -3rem;
+        bottom: 6rem;
+        animation: cardFloatRight 6.2s ease-in-out infinite 0.3s;
+      }
+
+      .floating-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--green);
+        margin-bottom: 0.35rem;
+      }
+
+      .floating-text {
+        font-size: 0.92rem;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+
+      .features {
+        width: 100%;
+        max-width: 980px;
+        margin: 5rem auto 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.25rem;
+      }
+
+      .feature-card {
+        border: 1px solid #f4f4f5;
+        background: rgba(255, 255, 255, 0.88);
+        border-radius: 2rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 24px rgba(24, 24, 27, 0.04);
+        backdrop-filter: blur(16px);
+        animation: fadeUp 0.7s ease both;
+      }
+
+      .feature-card:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+
+      .feature-card:nth-child(3) {
+        animation-delay: 0.24s;
+      }
+
+      .feature-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .feature-copy {
+        margin: 0.55rem 0 0;
+        font-size: 0.93rem;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      @keyframes deviceFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+
+      @keyframes floatOne {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-14px) rotate(-4deg); }
+      }
+
+      @keyframes floatTwo {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(16px) rotate(6deg); }
+      }
+
+      @keyframes floatThree {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(-12px) translateX(6px); }
+      }
+
+      @keyframes cardFloatLeft {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+
+      @keyframes cardFloatRight {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(10px); }
+      }
+
+      @keyframes tileFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .orb-2,
+        .orb-3,
+        .floating-card {
+          display: none;
+        }
+
+        .nav {
+          margin-bottom: 4rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          width: min(100% - 32px, 1280px);
+          padding-top: 1.25rem;
+          padding-bottom: 3rem;
+        }
+
+        .orb-1 {
+          display: none;
+        }
+
+        .nav {
+          margin-bottom: 3rem;
+        }
+
+        .brand-name {
+          font-size: 1rem;
+        }
+
+        .nav-button {
+          padding: 0.72rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .hero-subtitle {
+          margin-top: 1.5rem;
+          line-height: 1.65;
+        }
+
+        .device-section {
+          margin-top: 3.5rem;
+        }
+
+        .features {
+          grid-template-columns: 1fr;
+          margin-top: 3.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <div class="container">
+        <nav class="nav">
+          <div class="brand">
+            <div class="brand-mark">
+              <!-- Replace with your logo file -->
+              <img src="./images/greenskeeper-logo.png" alt="Greenskeeper logo" onerror="this.style.display='none';" />
+            </div>
+            <div class="brand-name">Greenskeeper</div>
+          </div>
+
+          <a class="nav-button" href="#download">Download</a>
+        </nav>
+
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">WELCOME TO GREENSKEEPER</div>
+            <h1 class="hero-title">Every course.<br />Every memory.</h1>
+            <p class="hero-subtitle">
+              Collect badges, save memories, and build a beautiful visual record of your golf journey in one effortlessly simple app.
+            </p>
+
+            <div class="download-wrap" id="download">
+            <div class="brand-mark">
+              <!-- Replace with your logo file -->
+              <img src="./images/greenskeeper-logo.png" alt="Greenskeeper logo" onerror="this.style.display='none';" />
+            </div>
+              <a class="app-store-badge" href="#" aria-label="Download on the App Store">
+                <svg viewBox="0 0 24 24" class="app-store-icon" aria-hidden="true">
+                  <path d="M16.365 12.245c.022 2.403 2.11 3.203 2.133 3.213-.018.056-.333 1.146-1.098 2.271-.661.972-1.347 1.94-2.427 1.96-1.06.02-1.4-.629-2.613-.629-1.214 0-1.59.609-2.593.649-1.044.04-1.84-1.046-2.507-2.014-1.363-1.973-2.404-5.577-1.007-8.004.694-1.206 1.935-1.969 3.282-1.989 1.023-.02 1.989.689 2.613.689.624 0 1.797-.852 3.029-.727.516.021 1.967.208 2.897 1.57-.075.047-1.73 1.011-1.709 3.011ZM14.588 4.24c.559-.677.936-1.619.833-2.56-.806.032-1.782.537-2.36 1.214-.518.599-.972 1.56-.849 2.48.899.07 1.817-.457 2.376-1.134Z" />
+                </svg>
+                <span>
+                  <div class="app-store-top">Download on the</div>
+                  <div class="app-store-bottom">App Store</div>
+                </span>
+              </a>
+              <div class="coming-soon">Coming soon on iPhone</div>
+            </div>
+          </div>
+
+          <div class="device-section">
+            <div class="device-glow"></div>
+
+            <div class="device-float">
+              <div class="phone-shell">
+                <div class="phone-frame">
+                  <div class="phone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="phone-image-wrap">
+                      <!-- Replace with your real iPhone mockup image -->
+                      <img
+                        class="phone-image"
+                        src="./images/iphone-mockup.png"
+                        alt="Greenskeeper iPhone app preview"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                      />
+
+                      <div class="placeholder-ui" style="display:none;">
+                        <div class="placeholder-bar"></div>
+                        <div class="placeholder-grid">
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                          <div class="placeholder-cell"></div>
+                        </div>
+                        <div class="placeholder-stack">
+                          <div class="placeholder-row"></div>
+                          <div class="placeholder-row"></div>
+                          <div class="placeholder-row"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="floating-card left">
+                <div class="floating-label">Collect badges</div>
+                <div class="floating-text">Build a course canvas worth showing off.</div>
+              </div>
+
+              <div class="floating-card right">
+                <div class="floating-label">Share your courses</div>
+                <div class="floating-text">Share your canvas, map or journey with one tap.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="features">
+            <article class="feature-card">
+              <h2 class="feature-title">Track Courses</h2>
+              <p class="feature-copy">Keep a personal record of every course you have played.</p>
+            </article>
+
+            <article class="feature-card">
+              <h2 class="feature-title">Collect Badges</h2>
+              <p class="feature-copy">Build a canvas filled with meaningful golf memories.</p>
+            </article>
+
+            <article class="feature-card">
+              <h2 class="feature-title">Share Your Journey</h2>
+              <p class="feature-copy">Show friends the courses and moments that shaped your golf story.</p>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
