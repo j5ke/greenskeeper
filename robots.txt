@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://getgreenskeeper.com/sitemap.xml

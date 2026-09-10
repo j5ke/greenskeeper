@@ -16,7 +16,7 @@
 </head>
 <body>
   <h1>Greenskeeper Privacy Policy</h1>
-  <p class="muted"><strong>Last updated:</strong> April 3, 2026</p>
+  <p class="muted"><strong>Last updated:</strong> September 7, 2026</p>
 
   <p>
     This Privacy Policy explains how Greenskeeper (“Greenskeeper,” “the App,” “we,” “us,” or “our”) collects, uses, stores, and discloses information when you use the Greenskeeper iOS application and related premium subscription features branded as <strong>Greenskeeper+</strong>.
@@ -24,7 +24,7 @@
 
   <h2>1. Summary</h2>
   <p>
-    Greenskeeper is designed to work without a developer-hosted account. Most content you create in the app is stored on your device and, if you enable backup features, in your personal iCloud account through Apple’s services. We also use third-party services for subscription management and advertising measurement, including RevenueCat and TikTok App Events.
+    Greenskeeper is designed to work without a developer-hosted account. Most content you create in the app is stored on your device and, if you enable backup features, in your personal iCloud account through Apple’s services. We also use third-party services for subscription management, analytics, and advertising measurement, including RevenueCat, AppsFlyer, and TikTok App Events.
   </p>
   <p>
     Depending on which features you use, Greenskeeper may process or disclose user-generated content, photos, precise location, subscription and purchase information, device identifiers, and product interaction data. We do not sell your personal information for money, but we may share limited data with service providers and advertising/measurement partners as described below.
@@ -39,18 +39,22 @@
   </p>
   <ul>
     <li><strong>User-generated content:</strong> golf courses you save, visit dates, scores, ratings, notes, badge customizations, and related course information</li>
-    <li><strong>Photos and photo metadata:</strong> photos you choose to add, and location metadata embedded in selected photos when you use automatic course detection</li>
+    <li><strong>Photos and photo metadata:</strong> photos you choose to add, and the creation date and location metadata attached to photos in your device photo library. When you use automatic course detection, we read metadata from the single photo you select. When you use photo memory suggestions, the app reads the dates and location metadata of photos in your library on your device in order to suggest which ones may match a course you saved. This scan happens entirely on your device, and no photo or photo metadata is uploaded to us or to any third party unless you choose to add that photo to a course</li>
     <li><strong>Precise location:</strong> your device location when you allow location access for nearby course discovery</li>
     <li><strong>Subscription and purchase information:</strong> subscription status, entitlements, product identifiers, renewal state, expiration status, and purchase history needed to unlock Greenskeeper+ features</li>
     <li><strong>Device and app information:</strong> bundle identifier, app version, build number, operating system version, device model, locale, IP address, user agent, and related app/device context collected by integrated SDKs</li>
     <li><strong>Identifiers:</strong> device identifiers such as IDFV and, if permitted by Apple’s App Tracking Transparency framework, IDFA</li>
     <li><strong>Product interaction and event data:</strong> app launch, install, retention, subscription purchase, restore activity, and related in-app event measurement data</li>
     <li><strong>Backup availability information:</strong> iCloud container and file availability information needed to support backup and restore</li>
+    <li><strong>Home screen widget data:</strong> if you add a Greenskeeper widget, a small summary of your collection (such as course, state, and country counts, milestone progress, and one recent course name and date) is written to a shared app container on your device so the widget can display it</li>
   </ul>
 
   <h2>3. Local Device Storage</h2>
   <p>
     Greenskeeper stores user-generated content locally on your Apple device so the app can function. Local device storage is under your control and may remain on your device until you delete the app or remove that content.
+  </p>
+  <p>
+    If you add a Greenskeeper home screen or Lock Screen widget, the summary described above is stored in a shared container on the same device so the widget can read it. Depending on your device settings, widget content may be visible on a locked screen. Removing the widget and deleting the app removes this data.
   </p>
 
   <h2>4. Permissions and Device Access</h2>
@@ -58,12 +62,12 @@
     Greenskeeper may request access to the following device capabilities:
   </p>
   <ul>
-    <li><strong>Photos:</strong> to let you attach photos to courses and analyze selected photo metadata to suggest a course automatically</li>
+    <li><strong>Photos:</strong> to let you attach photos to courses, to analyze selected photo metadata to suggest a course automatically, and to look through photo dates and locations on your device to suggest photos that may belong to a course you saved. You review and choose every photo before it is added</li>
     <li><strong>Location:</strong> to find nearby golf courses and improve course suggestions</li>
     <li><strong>Tracking permission:</strong> if we present Apple’s App Tracking Transparency prompt, to allow advertising measurement and attribution using the advertising identifier (IDFA)</li>
   </ul>
   <p>
-    If you deny photo or location access, Greenskeeper will continue to work with reduced functionality. If you deny tracking permission, TikTok may still receive non-IDFA device and event data, but IDFA-based tracking and attribution will be limited or unavailable.
+    If you deny photo or location access, Greenskeeper will continue to work with reduced functionality. If you grant limited photo access, photo memory suggestions only consider the photos you have shared with the app. If you deny tracking permission, AppsFlyer and TikTok may still receive non-IDFA device and event data, but IDFA-based tracking and attribution will be limited or unavailable.
   </p>
 
   <h2>5. iCloud Backup and Restore</h2>
@@ -84,7 +88,13 @@
 
   <h2>7. Analytics, Tracking, and Advertising</h2>
   <p>
-    Greenskeeper uses the <strong>TikTok App Events SDK</strong> for app event measurement, campaign attribution, install/open reporting, purchase event reporting, and related advertising and analytics functionality.
+    Greenskeeper uses <strong>AppsFlyer</strong> as its primary analytics and attribution provider. AppsFlyer receives in-app event data such as app opens, session starts, screens viewed, course searches and saves, collection milestones, share activity, and subscription events including trial starts, purchases, restores, and cancellations, together with device and app context such as device model, operating system version, app version, locale, IP address, IDFV, and, if authorized under Apple’s App Tracking Transparency framework, IDFA. AppsFlyer also receives a pseudonymous customer identifier that lets us connect app activity to subscription status. We use this to understand how people find Greenskeeper and which parts of the app are working.
+  </p>
+  <p>
+    Greenskeeper removes free-text and precise-location fields, such as course names, place names, coordinates, notes, and error text, from analytics events before they are sent. Analytics events describe what happened in the app, not the content you wrote.
+  </p>
+  <p>
+    Greenskeeper also uses the <strong>TikTok App Events SDK</strong> for app event measurement, campaign attribution, install/open reporting, purchase event reporting, and related advertising and analytics functionality.
   </p>
   <p>
     Depending on your permissions, device settings, and TikTok SDK configuration, TikTok may receive event and device data such as app launches, installs, retention events, purchase events, product identifiers, purchase value and currency, device model, app version, operating system version, locale, IP address, user agent, IDFV, and, if authorized under Apple’s App Tracking Transparency framework, IDFA.
@@ -93,7 +103,7 @@
     TikTok’s SDK may also support enhanced interaction measurement features that collect screen, page, component, and UI interaction metadata to help with analytics, debugging, and advertising measurement. Where enabled, this may include screen names, view hierarchy metadata, button interaction metadata, and associated app context.
   </p>
   <p>
-    We do not sell your personal information for money. However, certain disclosures to advertising and attribution partners such as TikTok may be considered “sharing,” “tracking,” or use for “developer advertising or marketing” under some privacy laws and platform rules.
+    We do not sell your personal information for money. However, certain disclosures to analytics, advertising, and attribution partners such as AppsFlyer and TikTok may be considered “sharing,” “tracking,” or use for “developer advertising or marketing” under some privacy laws and platform rules.
   </p>
 
   <h2>8. Sharing of Information</h2>
@@ -103,6 +113,7 @@
   <ul>
     <li><strong>Apple</strong>, for App Store distribution, In-App Purchases, subscription billing, and iCloud storage</li>
     <li><strong>RevenueCat</strong>, for subscription purchase history, entitlement management, and subscription status verification</li>
+    <li><strong>AppsFlyer</strong>, for app analytics, install and campaign attribution, in-app event measurement, and subscription event reporting</li>
     <li><strong>TikTok</strong>, for advertising attribution, app event measurement, analytics, and related marketing performance reporting</li>
   </ul>
   <p>
@@ -111,7 +122,7 @@
 
   <h2>9. Data Retention</h2>
   <p>
-    Because Greenskeeper does not maintain most user content on developer-controlled servers, retention is generally determined by your device, your iCloud account, and your own actions. Data stored locally may remain until deleted from the app or until the app is removed. Data stored in iCloud may remain until removed from your iCloud account or overwritten by later backups. Data handled by Apple, RevenueCat, or TikTok is subject to those providers’ retention practices and policies.
+    Because Greenskeeper does not maintain most user content on developer-controlled servers, retention is generally determined by your device, your iCloud account, and your own actions. Data stored locally may remain until deleted from the app or until the app is removed. Data stored in iCloud may remain until removed from your iCloud account or overwritten by later backups. Data handled by Apple, RevenueCat, AppsFlyer, or TikTok is subject to those providers’ retention practices and policies.
   </p>
 
   <h2>10. Your Choices</h2>
@@ -144,12 +155,12 @@
 
   <h2>13. California Notice</h2>
   <p>
-    Greenskeeper does not sell personal information for money. However, because Greenskeeper uses TikTok App Events for attribution and advertising measurement, some data disclosures may be considered “sharing” or use for cross-context behavioral advertising under the CCPA/CPRA. California residents may contact us to exercise applicable privacy rights.
+    Greenskeeper does not sell personal information for money. However, because Greenskeeper uses AppsFlyer and TikTok App Events for attribution and advertising measurement, some data disclosures may be considered “sharing” or use for cross-context behavioral advertising under the CCPA/CPRA. California residents may contact us to exercise applicable privacy rights.
   </p>
 
   <h2>14. International Users</h2>
   <p>
-    Greenskeeper is offered through Apple’s App Store and may be downloaded in multiple regions. If you use the app outside the United States, you understand that Apple, RevenueCat, TikTok, and other service providers may process information in the United States or other countries where they operate, subject to their own systems and policies.
+    Greenskeeper is offered through Apple’s App Store and may be downloaded in multiple regions. If you use the app outside the United States, you understand that Apple, RevenueCat, AppsFlyer, TikTok, and other service providers may process information in the United States or other countries where they operate, subject to their own systems and policies.
   </p>
 
   <h2>15. Changes to This Policy</h2>
