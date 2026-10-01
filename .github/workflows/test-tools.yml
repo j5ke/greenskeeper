@@ -1,0 +1,37 @@
+name: Free tools checks
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/**']
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: python -m unittest discover -s tests -v
+      - run: npm test
+      - run: python scripts/package_site.py
+      - run: npx playwright install --with-deps chromium
+      - name: Check the packaged site in headless Chromium
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/greenskeeper-tools-qa
+        run: |
+          python -m http.server 4173 --bind 127.0.0.1 --directory _site > /tmp/greenskeeper-preview.log 2>&1 &
+          curl --retry 10 --retry-connrefused --retry-delay 1 --fail http://127.0.0.1:4173/tools/ > /dev/null
+          npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golf-tools-visual-check
+          path: ${{ runner.temp }}/greenskeeper-tools-qa

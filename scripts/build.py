@@ -1,5 +1,6 @@
 """Dependency-free static site builder. Content is text, never executable HTML."""
 import argparse
+from tools import build_tools, TOOLS
 import html
 import json
 import math
@@ -78,7 +79,7 @@ def page(title, description, body, config, path='', prefix='', schema=None, jour
     download_nav = '' if article else f'<a class="button small" href="{esc(config["app_store_url"])}">Get the app ↗</a>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)}</title><meta name="description" content="{esc(description)}">{meta}<meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(description)}"><meta property="og:type" content="{'article' if article else 'website'}"><meta property="og:site_name" content="Greenskeeper"><meta name="twitter:card" content="summary"><link rel="icon" href="{prefix}images/greenskeeper-logo.png"><link rel="stylesheet" href="{prefix}assets/site.css">{structured}{'<script defer src="'+prefix+'assets/journal.js"></script>' if journal else ''}</head>
-<body><a class="skip" href="#main">Skip to content</a><header class="wrap"><nav class="nav" aria-label="Main navigation"><a class="brand" href="{prefix or './'}"><img src="{prefix}images/greenskeeper-logo.png" width="36" height="36" alt="">Greenskeeper</a><div class="nav-links"><a class="about-link" href="{prefix}home.html#your-game">The app</a><a href="{prefix}blog/" {'aria-current="page"' if journal else ''}>Journal</a>{download_nav}</div></nav></header><main id="main">{body}</main><footer class="wrap"><div class="footer"><a class="brand" href="{prefix or './'}">Greenskeeper<span aria-hidden="true">↗</span></a><div class="footer-links"><a href="{prefix}blog/">Journal</a><a href="{prefix}support.html">Support</a><a href="{prefix}privacy.html">Privacy</a><a href="{prefix}terms.html">Terms</a></div></div><div class="copyright">© {date.today().year} Greenskeeper. For the love of the game.</div></footer></body></html>'''
+<body><a class="skip" href="#main">Skip to content</a><header class="wrap"><nav class="nav" aria-label="Main navigation"><a class="brand" href="{prefix or './'}"><img src="{prefix}images/greenskeeper-logo.png" width="36" height="36" alt="">Greenskeeper</a><div class="nav-links"><a class="about-link" href="{prefix}home.html#your-game">The app</a><a href="{prefix}tools/">Free tools</a><a href="{prefix}blog/" {'aria-current="page"' if journal else ''}>Journal</a>{download_nav}</div></nav></header><main id="main">{body}</main><footer class="wrap"><div class="footer"><a class="brand" href="{prefix or './'}">Greenskeeper<span aria-hidden="true">↗</span></a><div class="footer-links"><a href="{prefix}tools/">Free tools</a><a href="{prefix}blog/">Journal</a><a href="{prefix}support.html">Support</a><a href="{prefix}privacy.html">Privacy</a><a href="{prefix}terms.html">Terms</a></div></div><div class="copyright">© {date.today().year} Greenskeeper. For the love of the game.</div></footer></body></html>'''
 
 def article_page(post, posts, config):
     prefix = '../../'
@@ -115,10 +116,11 @@ def build(root=ROOT, output=None):
         folder = output/'blog'/post['slug']
         folder.mkdir(exist_ok=True)
         (folder/'index.html').write_text(article_page(post,posts,config))
+    build_tools(output, root, config, page)
     (output/'.nojekyll').write_text('')
     if config['url']:
         xml = ET.Element('urlset',xmlns='http://www.sitemaps.org/schemas/sitemap/0.9')
-        for path in ['', 'blog/']+[f'blog/{p["slug"]}/' for p in posts]:
+        for path in ['', 'blog/', 'tools/']+[f'tools/{t[0]}/' for t in TOOLS]+[f'blog/{p["slug"]}/' for p in posts]:
             item=ET.SubElement(xml,'url')
             ET.SubElement(item,'loc').text=config['url']+'/'+path
         (output/'sitemap.xml').write_bytes(ET.tostring(xml,encoding='utf-8',xml_declaration=True))

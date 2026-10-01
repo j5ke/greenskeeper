@@ -1,0 +1,12 @@
+{
+  "name": "greenskeeper-website",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/tools-core.test.cjs",
+    "test:browser": "node tests/tools-browser.cjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "playwright": "1.61.1"
+  }
+}

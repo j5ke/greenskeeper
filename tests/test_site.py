@@ -42,6 +42,7 @@ class SiteTests(unittest.TestCase):
         self.post.pop('topic_id',None)
         self.post['date']='2026-01-01'
         self.post['slug']='fixture-golf-guide'
+        self.post['description']='A useful golf destination guide with courses, booking details, and trip planning advice.'
         # Keep tests independent of today's scheduled post and consumed topic queue.
         for article in (self.root/'content/posts').glob('*.json'):
             article.unlink()
@@ -50,7 +51,7 @@ class SiteTests(unittest.TestCase):
         self.temp.cleanup()
     def test_build_links_metadata_and_sitemap(self):
         build.build(self.root)
-        pages=[self.root/'index.html',self.root/'home.html']+list((self.root/'blog').rglob('*.html'))
+        pages=[self.root/'index.html',self.root/'home.html']+list((self.root/'blog').rglob('*.html'))+list((self.root/'tools').rglob('*.html'))
         for page in pages:
             with self.subTest(page=page):
                 source=page.read_text()
@@ -69,7 +70,7 @@ class SiteTests(unittest.TestCase):
                         self.assertIn(url.fragment,target_parser.ids)
         sitemap=ET.parse(self.root/'sitemap.xml')
         locations=[x.text for x in sitemap.findall('.//{*}loc')]
-        self.assertEqual(len(locations),len(build.read_posts(self.root))+2)
+        self.assertEqual(len(locations),len(build.read_posts(self.root))+8)
         self.assertTrue(all(x.startswith('https://getgreenskeeper.com/') for x in locations))
     def test_article_product_link_only_at_end(self):
         text=build.article_page(self.post,[self.post],json.loads((self.root/'site.json').read_text()))
