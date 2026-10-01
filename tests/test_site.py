@@ -70,8 +70,36 @@ class SiteTests(unittest.TestCase):
                         self.assertIn(url.fragment,target_parser.ids)
         sitemap=ET.parse(self.root/'sitemap.xml')
         locations=[x.text for x in sitemap.findall('.//{*}loc')]
-        self.assertEqual(len(locations),len(build.read_posts(self.root))+8)
+        self.assertEqual(len(locations),len(build.read_posts(self.root))+11)
         self.assertTrue(all(x.startswith('https://getgreenskeeper.com/') for x in locations))
+    def test_search_metadata_and_visible_tool_guidance(self):
+        build.build(self.root)
+        import re
+        titles = set()
+        for slug, *_ in build.TOOLS:
+            text = (self.root/'tools'/slug/'index.html').read_text()
+            title = re.search(r'<title>(.*?)</title>', text).group(1)
+            self.assertNotIn(title, titles)
+            titles.add(title)
+            self.assertIn('A worked example', text)
+            self.assertIn('Questions, answered.', text)
+            self.assertIn('og:image', text)
+            data = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', text).group(1))
+            graph = data['@graph']
+            self.assertTrue(any(item['@type'] == 'BreadcrumbList' for item in graph))
+            self.assertNotIn('aggregateRating', text)
+            self.assertEqual(text.count('rel="canonical"'), 1)
+        self.assertIn('Golf Daylight Calculator', (self.root/'tools/golf-daylight-calculator/index.html').read_text())
+
+    def test_analytics_requires_valid_explicit_configuration(self):
+        config = json.loads((self.root/'site.json').read_text())
+        html = build.page('Test', 'Test', '', config)
+        self.assertIn('name="plausible-script" content=""', html)
+        config['plausible_script'] = 'https://evil.example/tracker.js'
+        with self.assertRaises(ValueError): build.page('Test', 'Test', '', config)
+        config['plausible_script'] = 'https://plausible.io/js/pa-test123.js'
+        self.assertIn(config['plausible_script'], build.page('Test', 'Test', '', config))
+
     def test_article_product_link_only_at_end(self):
         text=build.article_page(self.post,[self.post],json.loads((self.root/'site.json').read_text()))
         self.assertEqual(text.count('apps.apple.com'),1)

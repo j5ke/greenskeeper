@@ -13,3 +13,10 @@
 @media print{.mobile-result-jump{display:none!important}}
 .tool-result{--muted:var(--green)}.tool-result.is-invalid{opacity:1;border-color:var(--green)}
 .tool-number{color:var(--green)}
+
+/* Useful guidance follows the workspace, keeping the tool first. */
+.tool-guide{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--line);margin-top:56px;line-height:1.75}
+.tool-guide h2{font-size:clamp(24px,3vw,34px);line-height:1.18;letter-spacing:-.035em;margin:12px 0 22px}
+.tool-guide h3{margin:28px 0 8px}.tool-guide ol{padding-left:22px}.tool-guide li{padding:0 0 12px 6px}
+.tool-questions details{border-bottom:1px solid var(--line);padding:18px 0}.tool-questions summary{font-weight:600;cursor:pointer;line-height:1.5}.tool-questions p{margin-bottom:0}
+@media(max-width:760px){.tool-guide{grid-template-columns:1fr;gap:24px;padding:40px 0}}

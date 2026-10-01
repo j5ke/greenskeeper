@@ -62,7 +62,7 @@ const path = require('node:path');
   await page.getByLabel('Member cost / round').fill('85'); assert.equal(await page.locator('#membership-break').textContent(),'No break-even');
   await page.getByLabel('Member cost / round').fill('20');
   await goto('golf-swing-analyzer');
-  assert.match(await page.getByRole('link',{name:'Open Swingalysis'}).getAttribute('href'),/^https:\/\/swingalysis.com\/analyze/);
+  assert.match(await page.getByRole('link',{name:'Open Swingalysis'}).getAttribute('href'),/^https:\/\/www\.swingalysis\.com\/analyze/);
   const routes = ['', 'golf-trip-planner','golf-trip-budget-calculator','golf-daylight-calculator','golf-membership-calculator','golf-swing-analyzer'];
   for (const width of [1440,390]) {
     await page.setViewportSize({width,height:1000});

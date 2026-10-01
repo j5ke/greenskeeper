@@ -1,0 +1,43 @@
+"""Visible, task-specific guidance shared with search metadata."""
+CONTENT = {
+ 'golf-trip-planner': {
+  'title': 'Free Golf Trip Planner: Itinerary & Tee Times | Greenskeeper',
+  'heading': 'Free golf trip planner',
+  'description': 'Plan a golf trip with tee times, travel buffers, booking notes, and a shared itinerary. Export to your calendar or PDF. Free, with no account needed.',
+  'steps': ['Set your travel dates, number of golfers, and the destination timezone.', 'Add each round, hotel check-in, meal, and transfer. Include travel time after each activity.', 'Check schedule conflicts, confirm bookings, then copy the itinerary or export a calendar file for your group.'],
+  'example': 'For a 9:00 a.m. tee time, a 270-minute round ends at 1:30 p.m. A 45-minute travel buffer leaves the next activity starting at 2:15 p.m. or later. Add lunch as its own activity before booking an afternoon round.',
+  'questions': [('Can I share the golf itinerary with my group?', 'Yes. Copy it into your group chat, print or save a PDF, export a calendar file, or download a trip file another golfer can open in this planner. Edits are not synced between devices.'), ('Does this book tee times or import my Greenskeeper courses?', 'No. Add course names and booking details yourself, then confirm reservations directly. This website cannot read the course collection stored on your phone.'), ('How should I plan 36 holes in one day?', 'Start with the first tee time, your realistic round duration, a meal break, and travel between courses. Check the second round against the daylight calculator and the course’s closing time.')],
+ },
+ 'golf-trip-budget-calculator': {
+  'title': 'Free Golf Trip Budget Calculator | Greenskeeper',
+  'heading': 'Golf trip budget calculator',
+  'description': 'Estimate golf trip costs per person and for your group. Split green fees, lodging, travel, and meals, and see what happens if a golfer drops out.',
+  'steps': ['Enter your group size, number of nights, and the currency used for all estimates.', 'Add green fees, carts, lodging, transport, meals, and other costs. Choose the correct per-person, per-night, or group-total basis.', 'Check each cost’s participants, fill in unknown amounts, and copy the budget for your group.'],
+  'example': 'Eight golfers sharing a $2,400 rental pay an average of $300 each for lodging. Three $100 rounds add $300 per golfer. That is $600 per golfer before transport, carts, meals, and other expenses. Enter the rental as a total so the nights are not counted twice.',
+  'questions': [('How are golf trip costs split?', 'Each expense is divided among the participants entered for that row. The headline per-golfer figure is the whole group’s average, not an individual invoice when participation differs.'), ('What happens if someone drops out?', 'The scenario holds group-total expenses fixed while reducing per-person charges. It assumes one fewer participant shares each affected cost. Refunds, cancellation fees, and room changes need to be entered separately.'), ('Should I add the deposit as another expense?', 'A deposit is part of the booking cost. Enter the full cost once to avoid counting the deposit twice. The calculator estimates costs; it does not track who has paid.')],
+ },
+ 'golf-daylight-calculator': {
+  'title': 'Golf Daylight Calculator: Finish Before Dark | Greenskeeper',
+  'heading': 'Golf daylight calculator',
+  'description': 'Can you finish 9 or 18 holes before dark? Find your latest golf tee time from estimated sunset, round duration, course location, and a daylight buffer.',
+  'steps': ['Choose the course area and date. For a closer estimate, enter course coordinates and its timezone.', 'Choose 9 or 18 holes and enter a realistic round duration, including likely waits.', 'Leave a buffer before sunset, then compare your tee time with the latest suggested start.'],
+  'example': 'If sunset is at 7:30 p.m., a four-hour round with a 30-minute daylight buffer needs a tee time by 3:00 p.m. A two-hour nine with the same buffer needs a start by 5:00 p.m. These are examples; use the date and course location above for your round.',
+  'questions': [('How is the latest golf tee time calculated?', 'Latest suggested tee time = estimated sunset − expected round duration − your daylight buffer. The estimate uses NOAA solar equations with the location and date you enter.'), ('Can I play golf after sunset?', 'Some light can remain, but trees, terrain, weather, and course rules can make the course unplayable earlier. This tool plans a finish before sunset rather than treating twilight as guaranteed playing time. Confirm cart-return and closing times with the course.'), ('How long should I allow for 9 or 18 holes?', 'Enter the pace you expect at that course. The initial 18-hole example uses 270 minutes, or four hours and 30 minutes; it is an editable assumption, not a promise about pace. Ask the course about busy periods.'), ('Does this use weather or live course conditions?', 'No. It calculates an astronomical sunset estimate in your browser. It does not use weather forecasts, live tee sheets, or terrain models. Increase your buffer when conditions call for it.')],
+ },
+ 'golf-membership-calculator': {
+  'title': 'Golf Membership Break-Even Calculator | Greenskeeper',
+  'heading': 'Golf membership break-even calculator',
+  'description': 'Is a golf membership worth it? Compare annual dues, joining fees, monthly minimums, and per-round costs against pay-as-you-play golf.',
+  'steps': ['Enter annual dues, any first-year joining fee, and extra monthly fees or minimum spending.', 'Compare the full public cost per round with the amount you still pay as a member.', 'Enter the rounds you expect to play at that club and compare first-year and later-year totals.'],
+  'example': 'With $3,500 annual dues, a $500 joining fee, and $50 in extra monthly costs, first-year fixed costs are $4,600. If public rounds cost $85 and member rounds cost $20, each round saves $65. $4,600 ÷ $65 = 70.77, so the first-year break-even is 71 rounds. Without the joining fee, later years break even at 64 rounds.',
+  'questions': [('What is the golf membership break-even formula?', 'Divide annual fixed membership costs by public cost per round minus member cost per round, then round up to a whole round. First-year fixed costs include the joining fee; later years exclude it.'), ('What if the member cost per round is higher?', 'If member rounds cost the same or more than public rounds, additional rounds cannot recover positive fixed membership costs through green-fee savings. The calculator shows when there is no financial break-even.'), ('Should food minimums and carts be included?', 'Include carts in the relevant per-round cost. Include monthly minimum spending only to the extent it is extra spending you would not otherwise make. Use tax-inclusive amounts and avoid counting the same cost twice.'), ('Does reaching break-even mean I should join?', 'It answers the cost question under your assumptions. Tee-time access, practice facilities, guest rules, and how often you play other courses still matter. Count only rounds you expect to play at that club.')],
+ },
+ 'golf-swing-analyzer': {
+  'title': 'Free Golf Swing Video Review: Swingalysis | Greenskeeper',
+  'heading': 'Swingalysis by Greenskeeper',
+  'description': 'Meet Swingalysis, Greenskeeper’s free golf swing video tool. Review frames, draw angles, compare swings, and export annotations in your browser.',
+  'steps': ['Open Swingalysis and choose a swing video from your device, or try the demo.', 'Step through the swing and add your own lines, angles, and reference marks.', 'Compare a second clip or export annotated screenshots and videos to discuss with your coach.'],
+  'example': 'Record two down-the-line swings from the same camera position. Align them at a shared moment, such as address, and compare your own reference lines side by side. Consistent framing makes the visual comparison more useful.',
+  'questions': [('Is Swingalysis an AI swing coach?', 'No. Swingalysis is a manual golf video-review tool. It does not assign swing scores, diagnose your technique, or calculate launch-monitor measurements.'), ('Are golf swing videos uploaded?', 'No. Video review and exports run locally in your browser. Project backups contain settings and drawings; keep the original video files to reopen them later.'), ('Where can I learn to record a useful swing video?', 'Swingalysis has a recording guide covering face-on and down-the-line camera placement, framing, and light. Start there before comparing clips.')],
+ },
+}
