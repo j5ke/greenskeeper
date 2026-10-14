@@ -11,21 +11,43 @@
   const addDays = (day, count) => new Date(Date.parse(day + 'T12:00:00Z') + count * 86400000).toISOString().slice(0, 10);
   const niceDate = day => new Intl.DateTimeFormat('en', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(day + 'T12:00:00Z'));
   const money = (cents, currency = 'USD') => new Intl.NumberFormat('en', { style: 'currency', currency, maximumFractionDigits: 2 }).format(cents / 100);
+  const track = (event, properties = {}) => { try { window.GKAnalytics?.capture(event, properties); } catch { /* Best effort. */ } };
+  const clickActions = { 'add-expense': 'expense-add', 'use-trip': 'trip-reuse' };
+  const formActions = { 'event-form': 'activity-save', 'membership-form': 'calculate' };
+  const handledExportErrors = new WeakSet();
+  let calculationTracked = false;
+  const trackCalculation = success => { if (!calculationTracked && success) { calculationTracked = true; track('tool_action', { action: 'calculate', outcome: 'success' }); } };
   let toastTimer;
   function notify(message) { const node = $('#tool-status'); node.textContent = message; node.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { node.hidden = true; }, 5000); }
   function error(message = '') { const node = $('#tool-error'); node.textContent = message; node.hidden = !message; $('.tool-result')?.classList.toggle('is-invalid', !!message); }
-  function guarded(action) { return (...args) => { try { error(); return action(...args); } catch (e) { error(e.message || 'Something went wrong. Please check your entries.'); } }; }
-  function download(name, value, type) { const url = URL.createObjectURL(new Blob([value], { type })); const a = el('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); window.dispatchEvent(new CustomEvent('greenskeeper:tool-export', { detail: type === 'text/calendar' ? 'calendar' : type === 'application/json' ? 'trip-file' : 'text' })); setTimeout(() => URL.revokeObjectURL(url), 2000); }
-  async function copy(value, filename) { try { await navigator.clipboard.writeText(value); window.dispatchEvent(new CustomEvent('greenskeeper:tool-export', { detail: 'clipboard' })); notify('Copied. Ready for the group chat.'); } catch { download(filename + '.txt', value, 'text/plain'); notify('Clipboard unavailable. Your summary downloaded instead.'); } }
+  function guarded(action, explicitAction) { return (...args) => {
+    const e = args[0];
+    const name = explicitAction || (e?.type === 'submit' ? formActions[e.currentTarget?.id] : e?.type === 'click' ? clickActions[e.currentTarget?.id] : undefined);
+    const event = e?.type === 'submit' ? 'form_submission' : 'tool_action';
+    if (name) track(event, { action: name, outcome: 'attempt' });
+    try { error(); const result = action(...args); if (e?.isTrusted && e.type === 'input') trackCalculation(true); if (name) track(event, { action: name, outcome: 'success' }); return result; }
+    catch (e) { const format = { 'copy-trip': 'clipboard', 'copy-budget': 'clipboard', 'copy-daylight': 'clipboard', 'copy-membership': 'clipboard', 'download-trip': 'trip-file', 'calendar-trip': 'calendar' }[args[0]?.currentTarget?.id]; if (format && !handledExportErrors.has(e)) { track('export_attempted', { format }); track('export_failed', { format }); } if (name) track(event, { action: name, outcome: 'failure' }); error(e.message || 'Something went wrong. Please check your entries.'); }
+  }; }
+  function download(name, value, type) {
+    const format = type === 'text/calendar' ? 'calendar' : type === 'application/json' ? 'trip-file' : 'text';
+    track('export_attempted', { format });
+    try { const url = URL.createObjectURL(new Blob([value], { type })); const a = el('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); track('export_completed', { format }); setTimeout(() => URL.revokeObjectURL(url), 2000); }
+    catch (e) { track('export_failed', { format }); if (e && typeof e === 'object') handledExportErrors.add(e); throw e; }
+  }
+  async function copy(value, filename) {
+    track('export_attempted', { format: 'clipboard' });
+    try { await navigator.clipboard.writeText(value); track('export_completed', { format: 'clipboard' }); notify('Copied. Ready for the group chat.'); }
+    catch { track('export_failed', { format: 'clipboard' }); try { download(filename + '.txt', value, 'text/plain'); notify('Clipboard unavailable. Your summary downloaded instead.'); } catch { error('Export unavailable. Please try again.'); } }
+  }
   function save(key, value, statusId) { try { localStorage.setItem(key, JSON.stringify(value)); if (statusId) text(statusId, 'Saved in this browser. Download or copy a backup before clearing browser data.'); } catch { if (statusId) text(statusId, 'Browser saving is unavailable. Keep this tab open and download or copy a backup.'); } }
   function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-  function button(label, callback, className = 'text-button') { const b = el('button', className, label); b.type = 'button'; b.addEventListener('click', guarded(callback)); return b; }
+  function button(label, callback, className = 'text-button') { const b = el('button', className, label); b.type = 'button'; b.addEventListener('click', guarded(callback, { Edit: 'activity-edit', Remove: document.querySelector('[data-tool]')?.dataset.tool === 'golf-trip-budget-calculator' ? 'expense-remove' : 'activity-remove', 'Remove cost': 'expense-remove' }[label])); return b; }
   function confirmAction(label, action) {
     const dialog = el('dialog', 'tool-dialog'); const heading = el('h2', '', label); const p = el('p', '', 'This replaces the draft saved in this browser. Download a backup first if you want to keep it.'); const controls = el('div', 'export-actions');
-    const cancel = button('Keep my draft', () => dialog.close(), 'secondary-button'); const proceed = button('Replace draft', () => { dialog.close(); action(); }, 'button');
+    const cancel = button('Keep my draft', () => dialog.close(), 'secondary-button'); const proceed = button('Replace draft', () => { dialog.close(); guarded(action, label.includes('example') ? 'sample-load' : label.includes('Open') ? undefined : 'reset')(); }, 'button');
     controls.append(cancel, proceed); dialog.append(heading, p, controls); dialog.setAttribute('aria-label', label); document.body.append(dialog); dialog.addEventListener('close', () => dialog.remove()); dialog.showModal(); cancel.focus();
   }
-  $$('[data-print]').forEach(b => b.addEventListener('click', () => window.print()));
+  $$('[data-print]').forEach(b => b.addEventListener('click', () => { track('print_requested'); window.print(); }));
   const tool = $('.tool-page')?.dataset.tool;
   if (!tool || !C) return;
 
@@ -90,8 +112,8 @@
     $('#clear-trip').addEventListener('click', () => confirmAction('Start a fresh trip?', () => { trip = { ...trip, name: 'My golf trip', events: [] }; syncForm(); cancelEdit(); update(); }));
     $('#import-trip').addEventListener('click', () => $('#trip-file').click());
     $('#trip-file').addEventListener('change', async e => {
-      const file = e.target.files[0]; if (!file) return;
-      try { if (file.size > 200000) throw new Error('Choose a trip JSON file smaller than 200 KB.'); const parsed = C.validateTrip(JSON.parse(await file.text())); confirmAction('Open this trip file?', () => { trip = parsed; syncForm(); cancelEdit(); update(); notify('Trip file opened.'); }); } catch (err) { error(err instanceof SyntaxError ? 'This file is not valid JSON. Choose a downloaded Greenskeeper trip file.' : err.message); } finally { e.target.value = ''; }
+      const file = e.target.files[0]; if (!file) return; track('import_attempted');
+      try { if (file.size > 200000) throw new Error('Choose a trip JSON file smaller than 200 KB.'); const parsed = C.validateTrip(JSON.parse(await file.text())); confirmAction('Open this trip file?', () => { try { trip = parsed; syncForm(); cancelEdit(); update(); notify('Trip file opened.'); track('import_completed'); } catch (e) { track('import_failed'); throw e; } }); } catch (err) { track('import_failed'); error(err instanceof SyntaxError ? 'This file is not valid JSON. Choose a downloaded Greenskeeper trip file.' : err.message); } finally { e.target.value = ''; }
     });
     $('#copy-trip').addEventListener('click', guarded(() => copy(C.tripText(current()), 'greenskeeper-trip')));
     $('#download-trip').addEventListener('click', guarded(() => download('greenskeeper-trip.json', JSON.stringify(current(), null, 2), 'application/json')));
@@ -163,17 +185,18 @@
       $('#daylight-marker').style.left = `${Math.max(2,Math.min(98,(result.finish - result.sunrise)/(result.sunset-result.sunrise)*100))}%`;
       summary = `Golf daylight estimate · ${niceDate(v.date)}\n${v.holes} holes · ${v.zone}\nTee time: ${C.clock(C.minutes(v.tee))}\nLatest suggested tee time: ${fmt(result.latest)}\nEstimated finish: ${fmt(result.finish)}\nSunset: ${fmt(result.sunset)}\n${verdict}\nAllow for weather, shade, pace, and course closing times.`;
     }
-    const live = () => { try { error(); update(); } catch (e) { error(e.message); text('daylight-latest','—'); text('daylight-verdict','Check the details to update your estimate.'); text('daylight-finish','—'); text('daylight-sunset','—'); summary = ''; $('#copy-daylight').disabled = true; } };
-    form.addEventListener('submit', e => { e.preventDefault(); live(); });
+    const live = (submitted = false) => { if (submitted) track('form_submission', { action: 'calculate', outcome: 'attempt' }); try { error(); update(); if (submitted) track('form_submission', { action: 'calculate', outcome: 'success' }); } catch (e) { if (submitted) track('form_submission', { action: 'calculate', outcome: 'failure' }); error(e.message); text('daylight-latest','—'); text('daylight-verdict','Check the details to update your estimate.'); text('daylight-finish','—'); text('daylight-sunset','—'); summary = ''; $('#copy-daylight').disabled = true; } };
+    form.addEventListener('submit', e => { e.preventDefault(); live(true); });
     form.addEventListener('change', e => {
       if (e.target.name === 'place') { const c = cities[e.target.value]; if (c) { form.elements.lat.value = c[0]; form.elements.lng.value = c[1]; form.elements.zone.value = c[2]; } else $('#location-details').open = true; }
       if (['lat','lng','zone'].includes(e.target.name)) form.elements.place.value = 'custom';
-      if (e.target.name === 'holes') form.elements.duration.value = e.target.value === '9' ? '135' : '270'; live();
+      if (e.target.name === 'holes') form.elements.duration.value = e.target.value === '9' ? '135' : '270'; live(); if (e.isTrusted && !$('#tool-error').textContent) trackCalculation(true);
     });
     $('#locate-course').addEventListener('click', () => {
-      if (!navigator.geolocation) { error('Location is unavailable. Enter course coordinates instead.'); return; }
+      track('tool_action', { action: 'geolocation', outcome: 'attempt' });
+      if (!navigator.geolocation) { track('tool_action', { action: 'geolocation', outcome: 'failure' }); error('Location is unavailable. Enter course coordinates instead.'); return; }
       const b = $('#locate-course'); b.disabled = true; b.textContent = 'Finding your location…';
-      navigator.geolocation.getCurrentPosition(p => { b.disabled = false; b.textContent = 'Use my location'; form.elements.lat.value = p.coords.latitude.toFixed(5); form.elements.lng.value = p.coords.longitude.toFixed(5); form.elements.zone.value = Intl.DateTimeFormat().resolvedOptions().timeZone; form.elements.place.value = 'custom'; live(); notify('Coordinates set. Check that the timezone matches the course.'); }, () => { b.disabled = false; b.textContent = 'Use my location'; error('Location was unavailable or declined. Enter course coordinates instead.'); }, { timeout: 10000, maximumAge: 60000 });
+      navigator.geolocation.getCurrentPosition(p => { track('tool_action', { action: 'geolocation', outcome: 'success' }); b.disabled = false; b.textContent = 'Use my location'; form.elements.lat.value = p.coords.latitude.toFixed(5); form.elements.lng.value = p.coords.longitude.toFixed(5); form.elements.zone.value = Intl.DateTimeFormat().resolvedOptions().timeZone; form.elements.place.value = 'custom'; live(); notify('Coordinates set. Check that the timezone matches the course.'); }, () => { track('tool_action', { action: 'geolocation', outcome: 'failure' }); b.disabled = false; b.textContent = 'Use my location'; error('Location was unavailable or declined. Enter course coordinates instead.'); }, { timeout: 10000, maximumAge: 60000 });
     });
     $('#copy-daylight').addEventListener('click', guarded(() => { update(); if (summary) copy(summary,'golf-daylight'); })); live();
   }
@@ -189,7 +212,7 @@
       text('membership-context',r.saving <= 0 ? 'The member cost per round is at least the public rate. Playing more rounds does not recover fixed fees through round savings.' : `${cash(r.fixed)} in recurring annual costs. Each member round saves ${cash(r.saving)} before those fixed costs. Break-even means costing the same or less.`);
       summary = `Golf membership comparison · ${r.rounds} rounds/year\nPay as you play: ${cash(r.publicTotal)}\nMember first year: ${cash(r.firstYear)}\nMember later years: ${cash(r.ongoing)}\nFirst-year break-even: ${r.firstBreak === null ? 'Not reached through round savings' : r.firstBreak + ' rounds'}\nRecurring break-even: ${r.ongoingBreak === null ? 'Not reached through round savings' : r.ongoingBreak + ' rounds'}`;
     }
-    form.addEventListener('input', () => { try { error(); update(); $('#copy-membership').disabled = false; } catch(e) { error(e.message); summary = ''; text('membership-break','—'); text('membership-verdict','Complete the inputs to update your comparison.'); $('#copy-membership').disabled = true; } });
+    form.addEventListener('input', e => { try { error(); update(); if (e.isTrusted) trackCalculation(true); $('#copy-membership').disabled = false; } catch(e) { error(e.message); summary = ''; text('membership-break','—'); text('membership-verdict','Complete the inputs to update your comparison.'); $('#copy-membership').disabled = true; } });
     form.addEventListener('submit', guarded(e => { e.preventDefault(); update(); notify('Comparison updated.'); }));
     $('#copy-membership').addEventListener('click', guarded(() => { update(); copy(summary,'golf-membership'); })); guarded(update)();
   }

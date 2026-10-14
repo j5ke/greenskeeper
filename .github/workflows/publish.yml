@@ -19,10 +19,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
       - name: Validate and test
         run: python -m unittest discover -s tests -v
       - name: Build public artifact
         run: python scripts/package_site.py
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: Verify tools and private analytics before deploying
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/greenskeeper-tools-qa
+        run: |
+          python -m http.server 4173 --bind 127.0.0.1 --directory _site > /tmp/greenskeeper-preview.log 2>&1 &
+          curl --retry 10 --retry-connrefused --retry-delay 1 --fail http://127.0.0.1:4173/tools/ > /dev/null
+          npm run test:browser
+          npm run test:analytics-browser
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site

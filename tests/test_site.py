@@ -91,14 +91,12 @@ class SiteTests(unittest.TestCase):
             self.assertEqual(text.count('rel="canonical"'), 1)
         self.assertIn('Golf Daylight Calculator', (self.root/'tools/golf-daylight-calculator/index.html').read_text())
 
-    def test_analytics_requires_valid_explicit_configuration(self):
+    def test_analytics_only_activates_in_packaged_production(self):
         config = json.loads((self.root/'site.json').read_text())
         html = build.page('Test', 'Test', '', config)
-        self.assertIn('name="plausible-script" content=""', html)
-        config['plausible_script'] = 'https://evil.example/tracker.js'
-        with self.assertRaises(ValueError): build.page('Test', 'Test', '', config)
-        config['plausible_script'] = 'https://plausible.io/js/pa-test123.js'
-        self.assertIn(config['plausible_script'], build.page('Test', 'Test', '', config))
+        self.assertEqual(html.count('src="assets/analytics.js"'), 1)
+        self.assertNotIn('plausible', html)
+        self.assertNotIn('analytics-environment', html)
 
     def test_article_product_link_only_at_end(self):
         text=build.article_page(self.post,[self.post],json.loads((self.root/'site.json').read_text()))

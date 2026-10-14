@@ -31,7 +31,7 @@ GitHub deployment reference: https://docs.github.com/en/pages/getting-started-wi
 - Membership comparisons include annual dues, monthly fees/minimums, initiation fees, and per-round charges. First and later years are shown separately. Inputs are illustrative defaults until replaced.
 - Swingalysis stays on its existing domain; the web editor already supports local video review and exports. There is no automatic app/project sync.
 
-All drafts stay in this browser. JSON and text downloads are portable backups. No signup, telemetry, or new service is required. Source videos and photos are not uploaded by these tools.
+All drafts stay in this browser. JSON and text downloads are portable backups. No signup is required. Minimal anonymous production analytics respects browser privacy signals and the privacy-page opt-out. Source videos and photos are not uploaded by these tools.
 
 ## Article generation
 
@@ -66,4 +66,4 @@ The browser suite runs headlessly. It checks tool interactions, imports/exports,
 
 For the exact GitHub Pages artifact, run `python3 scripts/package_site.py` and serve `_site` instead of the repository root. The artifact includes tool routes/assets and excludes tests, source scripts, planning docs, and Node packages.
 
-Feature work is on `codex/free-golf-tools`. Nothing from this branch deploys until it is merged to `main`. The companion Swingalysis work uses `codex/greenskeeper-branding`; see `docs/local-review.md` for both preview locations.
+See `docs/analytics.md` for production tracking, the shared PostHog dashboard, and privacy verification.

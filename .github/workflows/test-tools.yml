@@ -30,6 +30,7 @@ jobs:
           python -m http.server 4173 --bind 127.0.0.1 --directory _site > /tmp/greenskeeper-preview.log 2>&1 &
           curl --retry 10 --retry-connrefused --retry-delay 1 --fail http://127.0.0.1:4173/tools/ > /dev/null
           npm run test:browser
+          npm run test:analytics-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

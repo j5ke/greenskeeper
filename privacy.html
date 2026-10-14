@@ -13,7 +13,7 @@
     a { color: inherit; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   </style>
-<meta name="description" content="Read how Greenskeeper handles your app data, local golf planning tools, optional website analytics, and privacy choices."><link rel="canonical" href="https://getgreenskeeper.com/privacy.html"><meta property="og:title" content="Greenskeeper Privacy"><meta property="og:description" content="Read how Greenskeeper handles your app data, local golf planning tools, optional website analytics, and privacy choices."><meta property="og:url" content="https://getgreenskeeper.com/privacy.html"><meta property="og:type" content="website"><meta property="og:image" content="https://getgreenskeeper.com/images/greenskeeper-logo.png"></head>
+<meta name="description" content="Read how Greenskeeper handles your app data, local golf planning tools, optional website analytics, and privacy choices."><link rel="canonical" href="https://getgreenskeeper.com/privacy.html"><meta property="og:title" content="Greenskeeper Privacy"><meta property="og:description" content="Read how Greenskeeper handles your app data, local golf planning tools, optional website analytics, and privacy choices."><meta property="og:url" content="https://getgreenskeeper.com/privacy.html"><meta property="og:type" content="website"><meta property="og:image" content="https://getgreenskeeper.com/images/greenskeeper-logo.png"><script defer src="/assets/analytics.js"></script></head>
 <body>
   <h1>Greenskeeper Privacy Policy</h1>
   <p class="muted"><strong>Last updated:</strong> October 1, 2026</p>
@@ -62,8 +62,12 @@
   </p>
 
   <h2>Optional website measurement</h2>
-  <p>Website analytics is disabled until a Plausible Analytics site configuration is connected. When enabled, it measures page visits, referral domains, campaign tags, approximate country/region/city, device categories, tool engagement, exports, and clicks to Greenskeeper or the App Store. It does not receive trip names, booking notes, budget amounts, course coordinates, video files, or filenames. Approximate geography is derived by the analytics provider from the network request, not GPS.</p>
-  <p>The integration uses no analytics cookies and respects Do Not Track and Global Privacy Control. To opt out on this device, set <code>greenskeeper:analytics-opt-out</code> to <code>true</code> in this site’s local storage. These website settings are separate from the iPhone app’s analytics settings. <a href="https://plausible.io/data-policy">Plausible’s data policy</a> explains its processing.</p>
+  <p>We use PostHog for anonymous website visits, referral origins, important app and tool links, journal use, successful local form actions, and import/export outcomes. A random browser identifier is stored in local storage; no analytics cookies or person profiles are created. All Greenskeeper events use our shared project with the site label “greenskeeper”. IP geolocation, session replay, automatic click capture, heatmaps, and exception capture are disabled. The provider receives ordinary network information needed to deliver requests.</p>
+  <p>We never send form contents, names, emails, notes, filenames, files, coordinates, calculator inputs or results, search text, query strings, or raw error messages. Only public page routes, referral origins, and fixed action categories are sent. Tracking runs on production only, respects Do Not Track and Global Privacy Control, and honors existing browser opt-outs. Your browser choice below is separate from iPhone app analytics. <a href="https://posthog.com/privacy">PostHog’s privacy policy</a> explains its processing.</p>
+  <p id="analytics-status" role="status">Website analytics preferences require JavaScript. Do Not Track and Global Privacy Control are respected automatically.</p>
+  <button type="button" id="analytics-disable">Turn off website analytics</button>
+  <button type="button" id="analytics-enable">Allow anonymous website analytics</button>
+  <p>Turning analytics back on does not override a browser privacy signal. If browser storage is unavailable, tracking stays off. This preference applies to this browser and domain.</p>
   <h2>4. Permissions and Device Access</h2>
   <p>
     Greenskeeper may request access to the following device capabilities:

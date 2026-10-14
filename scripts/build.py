@@ -90,10 +90,7 @@ def page(title, description, body, config, path='', prefix='', schema=None, jour
             crumbs.append((title.split(' | ')[0], canonical))
         graph.append({'@type':'BreadcrumbList', 'itemListElement':[{'@type':'ListItem', 'position':i+1, 'name':name, 'item':url} for i,(name,url) in enumerate(crumbs)]})
     structured = '<script type="application/ld+json">'+json.dumps({'@context':'https://schema.org','@graph':graph}, ensure_ascii=False).replace('<', '\\u003c')+'</script>'
-    analytics_script = config.get('plausible_script', '')
-    if analytics_script and not re.fullmatch(r'https://plausible\.io/js/pa-[A-Za-z0-9_-]+\.js', analytics_script):
-        raise ValueError('Use the site-specific Plausible script URL from its installation snippet')
-    meta += f'<meta name="plausible-script" content="{esc(analytics_script)}"><script defer src="{prefix}assets/analytics.js"></script>'
+    meta += f'<script defer src="{prefix}assets/analytics.js"></script>'
     social_image = base+'/images/canvas-preview.png'
     meta += f'<meta property="og:image" content="{esc(social_image)}"><meta property="og:image:alt" content="Greenskeeper golf course collection"><meta name="twitter:title" content="{esc(title)}"><meta name="twitter:description" content="{esc(description)}"><meta name="twitter:image" content="{esc(social_image)}"><meta name="robots" content="index,follow,max-image-preview:large">'
     download_nav = '' if article else f'<a class="button small" href="{esc(config["app_store_url"])}">Get the app ↗</a>'

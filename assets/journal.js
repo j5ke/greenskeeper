@@ -14,8 +14,11 @@ function filterPosts() {
   document.querySelector('#result-count').textContent = `${count} ${count === 1 ? 'guide' : 'guides'} found`;
 }
 if (search) {
-  search.addEventListener('input', filterPosts);
+  let analyticsTimer;
+  const trackJournal = action => { try { window.GKAnalytics?.capture('journal_used', { action }); } catch { /* Best effort. */ } };
+  search.addEventListener('input', () => { filterPosts(); clearTimeout(analyticsTimer); analyticsTimer = setTimeout(() => trackJournal('search'), 1500); });
   for (const button of buttons) button.addEventListener('click', () => {
+    trackJournal('filter');
     category = button.dataset.filter;
     for (const item of buttons) item.setAttribute('aria-pressed', String(item === button));
     filterPosts();
