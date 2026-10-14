@@ -21,6 +21,10 @@ const path = require('node:path');
     });
     const page=await context.newPage(); page.on('pageerror', e=>errors.push(e.message));
     page.on('response', async r=> { if(r.url().includes('us.i.posthog.com')) responses.push(r.status()); });
+    const waitEvent = async (event, tool, start = 0, format) => {
+      for (let i=0;i<200;i++) { if(captured.slice(start).some(p=>p.event===event&&p.properties.tool===tool&&(!format||p.properties.format===format))) return; await new Promise(resolve=>setTimeout(resolve,50)); }
+      assert.fail(`Timed out waiting for ${event} on ${tool}`);
+    };
     const visit = async route => { const start=captured.filter(p=>p.event==='$pageview').length; await page.goto('https://getgreenskeeper.com'+route); await page.waitForTimeout(250); assert.equal(captured.filter(p=>p.event==='$pageview').length,start+1,route); };
     await visit('/');
     await page.locator('nav a[href*="tools/"]').click(); await page.waitForTimeout(250);
@@ -28,23 +32,24 @@ const path = require('node:path');
     await visit('/tools/golf-trip-planner/');
     await page.locator('#event-form [name=eventName]').fill('PRIVATE COURSE SECRET');
     await page.locator('#event-form button[type=submit]').click();
-    await page.locator('#download-trip').click(); await page.locator('#calendar-trip').click(); await page.locator('#copy-trip').click();
+    await page.locator('#download-trip').click(); await page.locator('#calendar-trip').click(); await page.locator('#copy-trip').click(); await waitEvent('export_completed', 'golf-trip-planner');
     await page.locator('#trip-file').setInputFiles({name:'SECRET.json',mimeType:'application/json',buffer:Buffer.from('invalid private secret')});
     const saved = await page.evaluate(()=>localStorage.getItem('greenskeeper:trip:v1'));
     await page.locator('#trip-file').setInputFiles({name:'SECRET.json',mimeType:'application/json',buffer:Buffer.from(saved)});
     await page.getByRole('button',{name:'Replace draft',exact:true}).click();
-    await visit('/tools/golf-trip-budget-calculator/'); await page.locator('#budget-form [name=golfers]').fill('6'); await page.locator('#copy-budget').click();
-    await visit('/tools/golf-daylight-calculator/'); await page.locator('#daylight-form button[type=submit]').click(); await page.locator('#copy-daylight').click();
-    await visit('/tools/golf-membership-calculator/'); await page.locator('#membership-form button[type=submit]').click(); await page.locator('#copy-membership').click();
+    await visit('/tools/golf-trip-budget-calculator/'); await page.locator('#budget-form [name=golfers]').fill('6'); await page.locator('#copy-budget').click(); await waitEvent('export_completed', 'golf-trip-budget-calculator');
+    await visit('/tools/golf-daylight-calculator/'); await page.locator('#daylight-form button[type=submit]').click(); await page.locator('#copy-daylight').click(); await waitEvent('export_completed', 'golf-daylight-calculator');
+    await visit('/tools/golf-membership-calculator/'); await page.locator('#membership-form button[type=submit]').click(); await page.locator('#copy-membership').click(); await waitEvent('export_completed', 'golf-membership-calculator');
     if (!live) {
+      const fallbackStart=captured.length;
       await page.evaluate(() => { navigator.clipboard.writeText = async () => { throw new Error('PRIVATE SECRET'); }; });
       await page.locator('#copy-membership').click();
-      await page.waitForTimeout(150);
+      await waitEvent('export_completed', 'golf-membership-calculator', fallbackStart, 'text');
       assert.ok(captured.some(p=>p.event==='export_failed' && p.properties.format==='clipboard'));
       assert.ok(captured.some(p=>p.event==='export_completed' && p.properties.format==='text'));
       const before=captured.length;
       await page.evaluate(() => { URL.createObjectURL = () => { throw new Error('PRIVATE SECRET'); }; });
-      await page.locator('#copy-membership').click(); await page.waitForTimeout(150);
+      await page.locator('#copy-membership').click(); await waitEvent('export_failed', 'golf-membership-calculator', before, 'text');
       assert.equal(captured.slice(before).filter(p=>p.event==='export_failed'&&p.properties.format==='text').length,1);
     }
     await visit('/tools/golf-swing-analyzer/');
